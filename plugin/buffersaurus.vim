@@ -96,7 +96,7 @@ let s:buffersaurus_viewport_split_modes = {
             \ "T"   : "topleft sbuffer",
             \ "t"   : "leftabove sbuffer",
             \ "B"   : "botright sbuffer",
-            \ "b"   : "rightbelow",
+            \ "b"   : "rightbelow sbuffer",
             \ }
 " 2}}}
 
@@ -589,7 +589,7 @@ endfunction
 
 " 1}}}
 
-"  Catalog {{{1
+" Catalog {{{1
 " ==============================================================================
 
 " The main workhorse pseudo-object is created here ...
@@ -1181,6 +1181,14 @@ function! s:NewCatalogViewer(catalog, desc, ...)
     " Sets buffer key maps.
     function! l:catalog_viewer.setup_buffer_keymaps() dict
 
+        """" Disabling of unused modification keys
+        for key in [".", "p", "P", "C", "x", "X", "r", "R", "i", "I", "a", "A", "D", "S", "U"]
+            try
+                execute "nnoremap <buffer> " . key . " <NOP>"
+            catch //
+            endtry
+        endfor
+
         if !exists("g:buffersaurus_use_new_keymap") || !g:buffergator_use_new_keymap
 
             """" Index buffer management
@@ -1398,7 +1406,7 @@ function! s:NewCatalogViewer(catalog, desc, ...)
         let b:buffersaurus_last_render_time = localtime()
         try
             " remove extra last line
-            execute("normal! GVX")
+            execute('normal! GV"_X')
         catch //
         endtry
         setlocal nomodifiable
