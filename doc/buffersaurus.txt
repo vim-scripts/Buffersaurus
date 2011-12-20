@@ -1,4 +1,4 @@
-*buffersaurus.txt*	Buffer indexing and navigation plugin.
+*buffersaurus.txt*	For Vim version 7.3	Last change: 2011 December 20
 
 ===============================================================================
                                              *buffersaurus* *buffersaurus-contents*
@@ -25,7 +25,7 @@ the line matching the search pattern) or filtered for specific patterns.
                                                     *buffersaurus-basic-usage*
 BASIC USAGE~
 
-The command ":Bsgrep {pattern}" is the most general way of invoking
+The command "|:Bsgrep| {pattern}" is the most general way of invoking
 Buffersaurus. It will search all listed buffers for lines of text matching the
 given regular expression pattern. If you want Buffersaurus to search ONLY the
 current buffer, then follow the command with a bang operator to restrict the
@@ -71,14 +71,14 @@ indexed lines that do not match "{filter-pattern}". The filter can be switched
 off by ":Bsfilter!".
 
 You can close the catalog viewer by pressing "q". The last search results are
-retained in memory, and the command ":Bsopen" will open the viewer again to
+retained in memory, and the command "|:Bsopen|" will open the viewer again to
 re-display these; you may want to type "r" to re-run the search if any of your
 buffers have changed.
 
 Once you have carried out a search and jumped to a matched line, and/or closed
 the catalog viewer, you can jump to the next or previous matching line
 directly from a working listed buffer without going back to re-opening the
-catalog viewer. You can just use the commands ":Bsnext" or ":Bsprev".  For
+catalog viewer. You can just use the commands "|:Bsnext|" or "|:Bsprev|".  For
 convenience, you may want to map some keys to these commands if you find
 yourself using them a lot.
 
@@ -93,7 +93,7 @@ single regular expression pattern-based approach described above.
 "Table-of-Contents" Search~
 
 For some types of files, a "table-of-contents" can be generated using the
-command ":Bstoc". This will search all buffers (or just the current buffer if
+command "|:Bstoc|". This will search all buffers (or just the current buffer if
 the bang operator is used: ":Bstoc!") for a set of patterns that define
 "important" terms given the file types. For example, if dealing with common
 programming language source code files, all class and method/function
@@ -102,7 +102,7 @@ as above. Note that this only works if the filetype is known, and some clearly
 defined terms are available for that filetype: Python, C++, C, etc. With
 other filetypes, e.g. text, the pattern defaults to any lines with a
 non-whitepsace as the first character, which may or may not be useful. In
-these, as well as other cases, it makes sense to use the ":Bsterm" command.
+these, as well as other cases, it makes sense to use the "|:Bsterm|" command.
 
 -------------------------------------------------------------------------------
 "Term" Search~
@@ -128,7 +128,7 @@ definitions will extend Buffersaurus' built-in defintions.
                                                        *buffersaurus-commands*
 COMMANDS~
 
-:Bsg[rep][!] {search-pattern}
+:Bsg[rep][!] {search-pattern}                                        *:Bsgrep*
                     Search buffer(s) for the regular expression |pattern|
                     given by {search-pattern}. If
                     "g:buffersaurus_default_single_file" is not defined or
@@ -142,7 +142,7 @@ COMMANDS~
                     not false (0), then the pattern will also be assigned to
                     the search register.
 
-:Bstoc[!]
+:Bstoc[!]                                                             *:Bstoc*
                     Generate a "table of contents" type catalog for buffers,
                     based on the specific filetype of each buffer. If
                     "g:buffersaurus_default_single_file" is not defined or
@@ -155,7 +155,7 @@ COMMANDS~
                     all buffers. See |buffersaurus-filetype-patterns| for more
                     information on the patterns to be matched.
 
-:Bsterm[!] {term-name}
+:Bsterm[!] {term-name}                                               *:Bsterm*
                     Generate a catalog of occurrences of the term pattern
                     named {term-name} in buffers. If
                     "g:buffersaurus_default_single_file" is not defined or
@@ -168,22 +168,22 @@ COMMANDS~
                     all buffers. See |buffersaurus-term-patterns| for
                     information on defining and using terms.
 
-:Bso[pen]
+:Bso[pen]                                                            *:Bsopen*
                     (Re-)open the most recent catalog.
 
-:Bsn[ext]
+:Bsn[ext]                                                            *:Bsnext*
                     Go to the next matched line from the most recent catalog
                     (like |:cnext|).
 
-:Bsp[rev]
+:Bsp[rev]                                                            *:Bsprev*
                     Go to the previous matched line from the most recent
                     catalog (like |:cprev|).
 
-:Bss[tatus][!]
+:Bss[tatus][!]                                                     *:Bsstatus*
                     Show brief (without "!") or detailed (with "!")
                     description of the most recent catalog.
 
-:Bsf[ilter][!] [filter-pattern]
+:Bsf[ilter][!] [filter-pattern]                                    *:Bsfilter*
                     [Only available when inside a Buffergator catalog viewer
                     buffer] Without "!": filter results to only show lines
                     matching the regular expression |pattern|
@@ -309,5 +309,10 @@ g:buffersaurus_context_size~
     the number of lines of context to show before matching line, while second
     elements gives the number of lines of context to show after the matching
     line.
+
+g:buffersaurus_autodismiss_on_select~
+    Default: 1
+    Indicates whether the catalog viewer should disappear when using the
+    commands <CR>, o, s, i, t.
 
  vim:tw=78:ts=8:ft=help:norl:
