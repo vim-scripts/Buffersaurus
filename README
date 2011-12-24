@@ -29,6 +29,10 @@ show a user-specified number of lines before or after the matching line).
 Results are grouped and sorted by filename, and then by line number, but can
 also be ungrouped and sorted lexically.
 
+Search and replace operations (using the ":Bsreplace" command, or "R" key
+mapping), or execution of arbitrary commands ("x" or "X" key mapping),
+can also be carried out on matched or contexted lines can be carried out
+
 Detailed usage description is given in the help file, which can be viewed
 on-line here:
 
