@@ -1,8 +1,7 @@
 *buffersaurus.txt*	For Vim version 7.3	Last change: 2011 December 20
 
 ===============================================================================
-                                          *buffersaurus* *buffersaurus-contents*
-CONTENTS~
+CONTENTS                                  *buffersaurus* *buffersaurus-contents*
 
     1. Introduction ....................... |buffersaurus-introduction|
     2. Basic Usage ........................ |buffersaurus-basic-usage|
@@ -13,8 +12,7 @@ CONTENTS~
     6. Options and Settings ............... |buffersaurus-options|
 
 ===============================================================================
-                                                   *buffersaurus-introduction*
-INTRODUCTION~
+INTRODUCTION                                       *buffersaurus-introduction*
 
 Buffersaurus is a plugin for searching and indexing the contents of buffers
 for regular expression patterns or collections of regular expression patterns.
@@ -23,8 +21,7 @@ user-specifiable lines of context (i.e., a number of lines before and/or after
 the line matching the search pattern) or filtered for specific patterns.
 
 ===============================================================================
-                                                    *buffersaurus-basic-usage*
-BASIC USAGE~
+BASIC USAGE                                         *buffersaurus-basic-usage*
 
 The command "|:Bsgrep| {pattern}" is the most general way of invoking
 Buffersaurus. It will search all listed buffers for lines of text matching the
@@ -83,13 +80,13 @@ catalog viewer. You can just use the commands "|:Bsnext|" or "|:Bsprev|".  For
 convenience, you may want to map some keys to these commands if you find
 yourself using them a lot.
 
-In additon, Buffersaurus supports global replace operations ("|:Bsreplace|" or
-"R") or even the execution of arbitrary commands on the matched lines
-(|buffersaurus-special-operations|).
+In additon, Buffersaurus supports substitution operations ("|:Bssubstitute|" or
+"R"/<C-R>/"&") or even the execution of arbitrary commands on the matched
+lines (|buffersaurus-special-operations|). A global command for searching and
+replacing ("|:Bsreplace|") is also provided.
 
 ===============================================================================
-                                               *buffersaurus-special-searches*
-SPECIAL SEARCHES~
+SPECIAL SEARCHES                               *buffersaurus-special-searches*
 
 Buffersaurus provides two other approaches to search beyond the explicitly
 single regular expression pattern-based approach described above.
@@ -140,16 +137,14 @@ You can add more definitions by providing the dictionary definition in your
 definitions will extend Buffersaurus' built-in defintions.
 
 ===============================================================================
-                                               *buffersaurus-special-operations*
-SPECIAL OPERATIONS~
+SPECIAL OPERATIONS                           *buffersaurus-special-operations*
 
 Buffersaurus lets you execute arbitrary commands on matched lines
 using the "x" and "X" key maps. A specialized global replace operation is
-available via the ":|Bsreplace|" command or "R" key map.
+available via the ":|Bssubstitute|" command or "R"/"<C-R>"/"&" key maps.
 
 ===============================================================================
-                                                       *buffersaurus-commands*
-COMMANDS~
+COMMANDS                                               *buffersaurus-commands*
 
 -------------------------------------------------------------------------------
 Catalog generation commands~
@@ -178,6 +173,11 @@ However the banged versions of the commands will invert this behaviour.
                     See |buffersaurus-term-patterns| for information on
                     defining and using terms.
 
+:Bsreplace                                                         *:Bsreplace*
+                    Global search and replace. Will be prompted for a pattern
+                    for which to search for, and, if any matches, a string
+                    with which to replace the pattern.
+
 -------------------------------------------------------------------------------
 Other commands~
 
@@ -192,11 +192,11 @@ Other commands~
                     Go to the previous matched line from the most recent
                     catalog (like |:cprev|).
 
-:Bss[tatus][!]                                                     *:Bsstatus*
+:Bsi[nfo][!]                                                        *:Bsinfo*
                     Show brief (without "!") or detailed (with "!")
                     description of the most recent catalog.
 
-:Bsf[ilter][!] [filter-pattern]                                    *:Bsfilter*
+:Bsf[ilter][!] [filter-pattern]                                     *:Bsfilter*
                     [Only available when inside a Buffergator catalog viewer
                     buffer] Without "!": filter results to only show lines
                     matching the regular expression |pattern|
@@ -207,7 +207,7 @@ Other commands~
                     if [filter-pattern] is "*" or ".*", then the saved pattern
                     will be cleared and the filter removed.
 
-:Bsre[eplace][!]    [substitute-pattern-string]                   *:Bsreplace*
+:Bss[ubstitute][!] [substitute-pattern-string]                 *:Bssubstitute*
                     [Only available when inside a Buffergator catalog viewer
                     buffer] Apply substitution command (|:substitute|) using
                     [substitute-pattern-string] to all listed (unfilterd)
@@ -216,9 +216,9 @@ Other commands~
                     [substitute-pattern-string] is anything that follows
                     the |:substitute| command, e.g.
 >
-                        :Bsreplace /foo/bar/gc
-                        :Bsreplace @field@plain@e
-                        :Bsreplace /def\s\+pr\(\w\+\)_out/def pr\1_err/g
+                        :Bssub /foo/bar/gc
+                        :Bssub @field@plain@e
+                        :Bssub /def\s\+pr\(\w\+\)_out/def pr\1_err/g
 <
                     If [substitution-pattern-string] is not given, then you
                     will be prompted for a pattern to search for and a string
@@ -226,8 +226,7 @@ Other commands~
                     will automatically be applied.
 
 ===============================================================================
-                                                           *buffersaurus-keys*
-KEY MAPPINGS (CATALOG VIEWER)~
+KEY MAPPINGS (CATALOG VIEWER)                              *buffersaurus-keys*
 
 Search results are stored a "catalog", and displayed in special buffer
 referred to as a "catalog viewer".  The following key mappings are available
@@ -292,13 +291,15 @@ Mappings That Carry Out Special Operations~
 
 x                 Execute command on all matched lines.
 X                 Execute command all all matched and all context lines.
-R                 Search and replace operation on all matched lines.
-<C-R>             Search and replace operation on all matched lines.
-&                 Search and replace operation on all context lines.
+&                 Replace search pattern on all matched lines (will prompt for
+                  replace string).
+<C-R>             Replace search pattern on all matched lines (will prompt for
+                  replace string).
+R                 Search and replace operation on all matched lines (will
+                  prompt for search pattern as well as replace string).
 
 ===============================================================================
-                                                        *buffersaurus-options*
-OPTIONS AND SETTINGS~
+OPTIONS AND SETTINGS                                    *buffersaurus-options*
 
 The following options can be used to customize the behavior of this plugin.
 

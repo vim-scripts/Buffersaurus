@@ -450,7 +450,7 @@ function! s:NewIndexer()
     let l:indexer["element_term_map"] = {
         \   'PyClass'     : '^\s*class\s\+[A-Za-z_]\i\+(.*'
         \ , 'PyDef'       : '^\s*def\s\+[A-Za-z_]\i\+(.*'
-        \ , 'VimFunction' : '^\C[:[:space:]]*fu\%[nction]\>!\=\s*\S\+('
+        \ , 'VimFunction' : '^\C[:[:space:]]*fu\%[nction]\>!\=\s*\S\+\s*('
         \ , 'VimMapping'  : '^\C[:[:space:]]*[nvxsoilc]\=\(\%(nore\|un\)\=map\>\|mapclear\)\>'
         \ , 'VimCommand'  : '^\C[:[:space:]]*com\%[mand]\>'
         \ , 'CppClass'    : '^\s*\(\(public\|private\|protected\)\s*:\)\=\s*\(class\|struct\)\s\+\w\+\>\(\s*;\)\@!'
@@ -1192,8 +1192,8 @@ function! s:NewCatalogViewer(catalog, desc, ...)
 
     " Sets buffer commands.
     function! l:catalog_viewer.setup_buffer_commands() dict
-        command! -bang -nargs=* Bsfilter  :call b:buffersaurus_catalog_viewer.set_filter('<bang>', <q-args>)
-        command! -bang -nargs=* Bsreplace :call b:buffersaurus_catalog_viewer.search_and_replace('<bang>', <q-args>)
+        command! -buffer -bang -nargs=* Bsfilter     :call b:buffersaurus_catalog_viewer.set_filter('<bang>', <q-args>)
+        command! -buffer -bang -nargs=* Bssubstitute :call b:buffersaurus_catalog_viewer.search_and_replace('<bang>', <q-args>, 0)
         augroup BuffersaurusCatalogViewer
             au!
             autocmd CursorHold,CursorHoldI,CursorMoved,CursorMovedI,BufEnter,BufLeave <buffer> call b:buffersaurus_catalog_viewer.highlight_current_line()
@@ -1268,9 +1268,9 @@ function! s:NewCatalogViewer(catalog, desc, ...)
             """"" Special operations
             nnoremap <buffer> <silent> x        :call b:buffersaurus_catalog_viewer.execute_command("", 0, 1)<CR>
             nnoremap <buffer> <silent> X        :call b:buffersaurus_catalog_viewer.execute_command("", 1, 1)<CR>
-            nnoremap <buffer> <silent> R        :call b:buffersaurus_catalog_viewer.search_and_replace("", 0)<CR>
-            nnoremap <buffer> <silent> <C-R>    :call b:buffersaurus_catalog_viewer.search_and_replace("", 0)<CR>
-            nnoremap <buffer> <silent> &        :call b:buffersaurus_catalog_viewer.search_and_replace("", 1)<CR>
+            nnoremap <buffer> <silent> R        :call b:buffersaurus_catalog_viewer.search_and_replace("", 0, 1)<CR>
+            nnoremap <buffer> <silent> <C-R>    :call b:buffersaurus_catalog_viewer.search_and_replace("", 0, 1)<CR>
+            nnoremap <buffer> <silent> &        :call b:buffersaurus_catalog_viewer.search_and_replace("", 0, 1)<CR>
 
         else
 
@@ -1343,16 +1343,20 @@ function! s:NewCatalogViewer(catalog, desc, ...)
     endfunction
 
     " Search and replace
-    function! l:catalog_viewer.search_and_replace(bang, pattern) dict
+    function! l:catalog_viewer.search_and_replace(bang, sr_pattern, assume_last_search_pattern) dict
         if a:bang
             let l:include_context_lines = 1
         else
             let l:include_context_lines = 0
         endif
-        if empty(a:pattern)
-            let l:pattern = input("Search for: ", s:last_searched_pattern)
-            if empty(l:pattern)
-                return
+        if empty(a:sr_pattern)
+            if a:assume_last_search_pattern
+                let l:pattern = s:last_searched_pattern
+            else
+                let l:pattern = input("Search for: ", s:last_searched_pattern)
+                if empty(l:pattern)
+                    return
+                endif
             endif
             let l:replace = input("Replace with: ", l:pattern)
             if empty(l:replace)
@@ -1365,7 +1369,7 @@ function! s:NewCatalogViewer(catalog, desc, ...)
             endfor
             let l:command = "s" . l:separator . l:pattern . l:separator . l:replace . l:separator . "ge"
         else
-            let l:command = "s" . a:pattern
+            let l:command = "s" . a:sr_pattern
         endif
         call self.execute_command(l:command, l:include_context_lines, 1)
     endfunction
@@ -1965,6 +1969,24 @@ function! <SID>IndexTags(bang)
     call s:ActivateCatalog("tags", l:catalog)
 endfunction
 
+function! <SID>GlobalSearchAndReplace()
+    let l:pattern = input("Search for: ", s:last_searched_pattern)
+    if empty(l:pattern)
+        return
+    endif
+    let l:worklist = s:ComposeBufferTargetList(0)
+    let l:catalog = s:_buffersaurus_indexer.index_pattern(l:worklist, l:pattern, '')
+    let s:last_searched_pattern = l:pattern
+    let s:_buffersaurus_last_catalog_built = l:catalog
+    let s:_buffersaurus_last_catalog_viewed = l:catalog.open()
+    if l:catalog.size() > 0
+        call l:catalog.describe()
+        call s:_buffersaurus_last_catalog_viewed.search_and_replace(0, "", 1)
+    else
+        call s:_buffersaurus_messenger.send_status("no matches")
+    endif
+endfunction
+
 function! <SID>IndexPatterns(pattern, bang, sort_regime)
     if empty(a:pattern)
         call s:_buffersaurus_messenger.send_error("search pattern must be specified")
@@ -2103,7 +2125,8 @@ command! -bang -nargs=1 -complete=customlist,<SID>Complete_bsterm Bsterm        
 command! -nargs=0                                                 Bsopen          :call <SID>OpenLastActiveCatalog()
 command! -range -bang -nargs=0                                    Bsnext          :call <SID>GotoEntry("n")
 command! -range -bang -nargs=0                                    Bsprev          :call <SID>GotoEntry("p")
-command! -bang -nargs=0                                           Bsstatus        :call <SID>ShowCatalogStatus('<bang>')
+command! -bang -nargs=0                                           Bsinfo          :call <SID>ShowCatalogStatus('<bang>')
+command!       -nargs=0                                           Bsreplace       :call <SID>GlobalSearchAndReplace()
 
 " (development/debugging) "
 let g:buffersaurus_plugin_path = expand('<sfile>:p')
